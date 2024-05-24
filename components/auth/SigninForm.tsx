@@ -2,7 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { CardWrapper } from "@/components/auth/CardWrapper";
 import {
@@ -22,10 +23,24 @@ import FormSuccess from "@/components/FormSuccess";
 import { signin } from "@/actions/signin";
 
 export default function SigninForm() {
+    const searchParams = useSearchParams();
     const [formMessage, setFormMessage] = useState<{
         success: boolean;
         message: string;
     }>();
+
+    useEffect(() => {
+        if (searchParams.get("error")) {
+            setFormMessage({
+                success: false,
+                message:
+                    searchParams.get("error") === "OAuthAccountNotLinked"
+                        ? "Email already exists. Please sign in with your email and password."
+                        : "An unexpected error occurred",
+            });
+        }
+    }, [searchParams]);
+
     const [isPending, startTransition] = useTransition();
     const form = useForm<z.infer<typeof SigninSchema>>({
         resolver: zodResolver(SigninSchema),

@@ -1,12 +1,14 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
+import { AuthError } from "next-auth";
 
 import { SigninSchema } from "@/schemas";
 import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { AuthError } from "next-auth";
+import { getUserByEmail } from "@/data/user";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 
 export const signin = async (values: z.infer<typeof SigninSchema>) => {
     const validatedfields = SigninSchema.safeParse(values);
@@ -16,6 +18,25 @@ export const signin = async (values: z.infer<typeof SigninSchema>) => {
     }
 
     const { email, password } = validatedfields.data;
+
+    const existingUser = await getUserByEmail(email);
+
+    if (!existingUser || !existingUser.email || !existingUser.password) {
+        return { success: false, message: "Email doesnot exist!" };
+    }
+
+    if (!existingUser.emailVerified) {
+        const verificationToken = await generateVerificationToken(
+            existingUser.email
+        );
+
+        await sendVerificationEmail(
+            verificationToken.email,
+            verificationToken.token
+        );
+
+        return { success: true, message: "Confimation email sent!" };
+    }
 
     try {
         await signIn("credentials", {
