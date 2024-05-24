@@ -3,7 +3,11 @@
  * These routes are accessible without authentication
  * @type {string[]}
  */
-export const publicRoutes: string[] = ["/"];
+export const publicRoutes: string[] = [
+    "/",
+    "/auth/new-verification",
+    "/auth/reset-password",
+];
 
 /**
  * List of routes used for authentication
@@ -14,6 +18,7 @@ export const authRoutes: string[] = [
     "/auth/signin",
     "/auth/signup",
     "/auth/error",
+    "/auth/forgot-password",
 ];
 
 /**

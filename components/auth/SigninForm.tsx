@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button";
 import FormError from "@/components/FormError";
 import FormSuccess from "@/components/FormSuccess";
 import { signin } from "@/actions/signin";
+import { FaSpinner } from "react-icons/fa";
+import Link from "next/link";
 
 export default function SigninForm() {
     const searchParams = useSearchParams();
@@ -110,6 +112,16 @@ export default function SigninForm() {
                                             disabled={isPending}
                                         />
                                     </FormControl>
+                                    <Button
+                                        size="sm"
+                                        variant="link"
+                                        asChild
+                                        className="px-0 font-normal"
+                                    >
+                                        <Link href="/auth/forgot-password">
+                                            Forgot password?
+                                        </Link>
+                                    </Button>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -125,7 +137,14 @@ export default function SigninForm() {
                         className="w-full"
                         disabled={isPending}
                     >
-                        Sign in
+                        {isPending ? (
+                            <>
+                                <FaSpinner className="animate-spin mr-2" />
+                                Signing in...
+                            </>
+                        ) : (
+                            "Sign in"
+                        )}
                     </Button>
                 </form>
             </Form>
