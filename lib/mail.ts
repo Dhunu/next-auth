@@ -29,3 +29,14 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
             <a href="${resetLink}">Reset password</a>`,
     });
 };
+
+export const sendTwoFactorEmail = async (email: string, token: string) => {
+    await resend.emails.send({
+        from: "donot-reply@angelsaikia.com",
+        to: email,
+        subject: "Two-factor authentication",
+        html: `
+            <h1>Two-factor authentication</h1>
+            <p>Your OTP is: <strong>${token}</strong></p>`,
+    });
+};

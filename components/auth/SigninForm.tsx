@@ -23,9 +23,11 @@ import FormSuccess from "@/components/FormSuccess";
 import { signin } from "@/actions/signin";
 import { FaSpinner } from "react-icons/fa";
 import Link from "next/link";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 export default function SigninForm() {
     const searchParams = useSearchParams();
+    const [showTwoFactor, setShowTwoFactor] = useState(false);
     const [formMessage, setFormMessage] = useState<{
         success: boolean;
         message: string;
@@ -49,10 +51,13 @@ export default function SigninForm() {
         defaultValues: {
             email: "",
             password: "",
+            code: "",
         },
     });
 
     const onSubmit = async (data: z.infer<typeof SigninSchema>) => {
+        console.log({ data });
+
         startTransition(() => {
             signin(data).then((response) => {
                 if (response) {
@@ -60,10 +65,15 @@ export default function SigninForm() {
                         success: response.success ?? false,
                         message: response.message ?? "",
                     });
+
+                    if (!response.twoFactor) {
+                        form.reset();
+                    }
                 }
 
-                form.setValue("email", "");
-                form.setValue("password", "");
+                if (response?.twoFactor) {
+                    setShowTwoFactor(true);
+                }
             });
         });
     };
@@ -80,52 +90,84 @@ export default function SigninForm() {
                     className="space-y-6"
                 >
                     <div className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            placeholder="johndoe@example.com"
-                                            type="email"
-                                            disabled={isPending}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            placeholder="********"
-                                            type="password"
-                                            disabled={isPending}
-                                        />
-                                    </FormControl>
-                                    <Button
-                                        size="sm"
-                                        variant="link"
-                                        asChild
-                                        className="px-0 font-normal"
-                                    >
-                                        <Link href="/auth/forgot-password">
-                                            Forgot password?
-                                        </Link>
-                                    </Button>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {!showTwoFactor && (
+                            <FormField
+                                control={form.control}
+                                name="code"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="flex justify-center mb-4">
+                                            Enter OTP sent to your email
+                                        </FormLabel>
+                                        <FormControl>
+                                            <InputOTP {...field} maxLength={6}>
+                                                <InputOTPGroup className="ml-auto">
+                                                    <InputOTPSlot index={0} />
+                                                    <InputOTPSlot index={1} />
+                                                    <InputOTPSlot index={2} />
+                                                </InputOTPGroup>
+                                                <InputOTPGroup className="mr-auto">
+                                                    <InputOTPSlot index={3} />
+                                                    <InputOTPSlot index={4} />
+                                                    <InputOTPSlot index={5} />
+                                                </InputOTPGroup>
+                                            </InputOTP>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+                        {showTwoFactor && (
+                            <>
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder="johndoe@example.com"
+                                                    type="email"
+                                                    disabled={isPending}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Password</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder="********"
+                                                    type="password"
+                                                    disabled={isPending}
+                                                />
+                                            </FormControl>
+                                            <Button
+                                                size="sm"
+                                                variant="link"
+                                                asChild
+                                                className="px-0 font-normal"
+                                            >
+                                                <Link href="/auth/forgot-password">
+                                                    Forgot password?
+                                                </Link>
+                                            </Button>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </>
+                        )}
                     </div>
                     {formMessage?.success ? (
                         <FormSuccess message={formMessage?.message} />
@@ -142,6 +184,8 @@ export default function SigninForm() {
                                 <FaSpinner className="animate-spin mr-2" />
                                 Signing in...
                             </>
+                        ) : showTwoFactor ? (
+                            "Confirm"
                         ) : (
                             "Sign in"
                         )}
