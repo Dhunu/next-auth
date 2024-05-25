@@ -24,13 +24,21 @@ export default function Home() {
                     A Next.js starter with authentication using NextAuth.js
                 </p>
                 <div className="flex flex-col gap-5">
-                    <SigninButton mode="modal">
-                        <Button variant="secondary" size="lg">
+                    <SigninButton mode="modal" asChild>
+                        <Button
+                            variant="secondary"
+                            size="lg"
+                            className="w-40 mx-auto"
+                        >
                             Sign In (Modal)
                         </Button>
                     </SigninButton>
                     <SigninButton>
-                        <Button variant="secondary" size="lg">
+                        <Button
+                            variant="secondary"
+                            size="lg"
+                            className="w-40 mx-auto"
+                        >
                             Sign In (Redirect)
                         </Button>
                     </SigninButton>
