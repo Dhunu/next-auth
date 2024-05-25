@@ -27,6 +27,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 export default function SigninForm() {
     const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl");
     const [showTwoFactor, setShowTwoFactor] = useState(false);
     const [formMessage, setFormMessage] = useState<{
         success: boolean;
@@ -59,7 +60,7 @@ export default function SigninForm() {
         console.log({ data });
 
         startTransition(() => {
-            signin(data).then((response) => {
+            signin(data, callbackUrl).then((response) => {
                 if (response) {
                     setFormMessage({
                         success: response.success ?? false,

@@ -6,6 +6,7 @@ import { getUserById } from "@/data/user";
 import authConfig from "@/auth.config";
 import { db } from "@/lib/db";
 import { getTwoFactorConfirmationByUserId } from "@/data/twoFactorConfirmation";
+import { getAccountByUserId } from "./data/account";
 
 export const {
     handlers: { GET, POST },
@@ -56,14 +57,23 @@ export const {
             return true;
         },
         async session({ token, session }) {
-            console.log({ SessionToken: token });
-
             if (token.sub && session.user) {
                 session.user.id = token.sub;
             }
 
             if (token.role && session.user) {
                 session.user.role = token.role as UserRole;
+            }
+
+            if (session.user) {
+                session.user.isTwoFactorEnabled =
+                    token.isTwoFactorEnabled as boolean;
+            }
+
+            if (session.user && token.email && token.name) {
+                session.user.email = token.email;
+                session.user.name = token.name;
+                session.user.isOAuth = token.isOAuth as boolean;
             }
             return session;
         },
@@ -74,7 +84,13 @@ export const {
 
             if (!existingUser) return token;
 
+            const existinAccount = await getAccountByUserId(existingUser.id);
+
+            token.isOAuth = !!existinAccount;
+            token.name = existingUser.name;
+            token.email = existingUser.email;
             token.role = existingUser.role;
+            token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
             return token;
         },

@@ -23,10 +23,15 @@ export default function Home() {
                 <p className="text-white text-lg">
                     A Next.js starter with authentication using NextAuth.js
                 </p>
-                <div>
+                <div className="flex flex-col gap-5">
+                    <SigninButton mode="modal">
+                        <Button variant="secondary" size="lg">
+                            Sign In (Modal)
+                        </Button>
+                    </SigninButton>
                     <SigninButton>
                         <Button variant="secondary" size="lg">
-                            Sign In
+                            Sign In (Redirect)
                         </Button>
                     </SigninButton>
                 </div>
