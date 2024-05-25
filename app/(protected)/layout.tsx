@@ -1,5 +1,14 @@
 import { ReactNode } from "react";
 import Navbar from "./_components/Navbar";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: {
+        default: "Home",
+        template: "%s | Next-Auth",
+    },
+    description: "These are the page in the root",
+};
 
 interface ProtectedLayoutProps {
     children: ReactNode;
