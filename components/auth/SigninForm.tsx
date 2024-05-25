@@ -90,7 +90,7 @@ export default function SigninForm() {
                     className="space-y-6"
                 >
                     <div className="space-y-4">
-                        {!showTwoFactor && (
+                        {showTwoFactor && (
                             <FormField
                                 control={form.control}
                                 name="code"
@@ -118,7 +118,7 @@ export default function SigninForm() {
                                 )}
                             />
                         )}
-                        {showTwoFactor && (
+                        {!showTwoFactor && (
                             <>
                                 <FormField
                                     control={form.control}
